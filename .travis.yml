@@ -8,6 +8,7 @@ install:
 - go test -i ./...
 - go get -u github.com/mitchellh/gox
 - mkdir release
+- echo $TRAVIS_COMMIT_MESSAGE
 - cd release && gox -arch 'amd64' -os 'linux windows darwin' -ldflags "-X main.version=$TRAVIS_COMMIT_MESSAGE" ../src/...
 script:
 - cd $TRAVIS_BUILD_DIR
