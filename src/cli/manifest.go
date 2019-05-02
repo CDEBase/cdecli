@@ -68,15 +68,37 @@ func ReadManifest(context *ExtensionContext) (*Manifest, ExtensionLifecycle, err
 }
 
 type NpmPackage struct {
-	Name             string   `json:"name"`
-	Main             string   `json:"main"`
-	Type             string   `json:"type"`
-	Version          string   `json:"version"`
-	Publisher        string   `json:"publisher"`
-	Description      string   `json:"description"`
-	ExtensionID      string   `json:"extensionID"`
-	ActivationEvents []string `json:"activationEvents"`
-	Extension        struct {
+	Icon                  string            `json:"icon"`
+	Name                  string            `json:"name"`
+	Main                  string            `json:"main"`
+	Type                  string            `json:"type"`
+	Badges                []string          `json:"badges"`
+	Preview               bool              `json:"preview"`
+	Version               string            `json:"version"`
+	Keywords              []string          `json:"keywords"`
+	License               string            `json:"license"`
+	Homepage              string            `json:"homepage"`
+	Publisher             string            `json:"publisher"`
+	Categories            []string          `json:"categories"`
+	Description           string            `json:"description"`
+	ExtensionID           string            `json:"extensionID"`
+	DisplayName           string            `json:"displayName"`
+	Dependencies          map[string]string `json:"dependencies"`
+	DevDependencies       map[string]string `json:"devDependencies"`
+	ActivationEvents      []string          `json:"activationEvents"`
+	ExtensionDependencies []string          `json:"extensionDependencies"`
+	GalleryBanner         struct {
+		Color string `json:"color"`
+		Theme string `json:"theme"`
+	} `json:"galleryBanner"`
+	Author struct {
+		Name string `json:"name"`
+	} `json:"author"`
+	Engines struct {
+		Node   string `json:"node"`
+		VSCode string `json:"vscode"`
+	} `json:"engines"`
+	Extension struct {
 		ExtensionType string `json:"type"`
 	} `json:"extension"`
 	Bundles struct {

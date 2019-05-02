@@ -17,6 +17,7 @@ type ApplicationFlags struct {
 
 var (
 	config   *Config
+	version  = "0.0.1"
 	commands []cli.Command
 	flags    = ApplicationFlags{}
 )
@@ -30,7 +31,8 @@ func main() {
 	}
 
 	app := cli.NewApp()
-	app.Version = "0.0.1"
+
+	app.Version = version
 	app.EnableBashCompletion = true
 	app.Description = "CLI Tool for CDEBase extensions"
 
