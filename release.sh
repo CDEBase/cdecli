@@ -1,4 +1,4 @@
 set -ex
-git tag $VERSION -a -m "release v$VERSION"
-git tag latest -f -a -m "release v$VERSION"
+git tag $VERSION -a -m "v$VERSION"
+git tag latest -f -a -m "v$VERSION"
 git push -f --tags
