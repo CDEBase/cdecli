@@ -61,7 +61,7 @@
     "onCommand:go.tools.install",
     "onDebugResolve:go"
   ],
-  "main": "./out/src/goMain",
+  "main": "./main.js",
   "contributes": {
     "languages": [
       {
@@ -1367,6 +1367,9 @@
         }
       ]
     }
+  },
+  "extension": {
+    "type": "extension.simple"
   },
   "__metadata": {
     "id": "d6f6cfea-4b6f-41f4-b571-6ad2ab7918da",

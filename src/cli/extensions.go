@@ -48,7 +48,7 @@ func init() {
 					_, err = strategy.Build()
 					_, err = strategy.Pack()
 					_, err = strategy.Publish()
-					_, err = strategy.AddToRegistry()
+					_, err = strategy.AddToRegistry(&context)
 
 					if err != nil {
 						log.Fatal(err)
