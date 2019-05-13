@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/shurcooL/graphql"
+	"io/ioutil"
+	"path/filepath"
 )
 
 type ExtensionContext struct {
@@ -16,7 +18,7 @@ type ExtensionLifecycle interface {
 	Build() (bool, error)
 	Pack() (string, error)
 	Publish() (bool, error)
-	AddToRegistry() (bool, error)
+	AddToRegistry(context *ExtensionContext) (bool, error)
 }
 
 type AbstractExtension struct {
@@ -40,22 +42,30 @@ func (ae AbstractExtension) Build() (bool, error) {
 	return runCommand(ae.Context.Dir, ae.Manifest.Scripts.Build, "")
 }
 
-func (ae AbstractExtension) AddToRegistry() (bool, error) {
+func (ae AbstractExtension) AddToRegistry(ctx *ExtensionContext) (bool, error) {
+	manifest := ae.Manifest.String()
+
+	data, err := ioutil.ReadFile(filepath.Join(ctx.Dir, ctx.ManifestFile))
+
+	if err == nil {
+		manifest = string(data)
+	}
+
 	mutation, variables := NewPublishExtensionMutation(PublishExtensionVariables{
 		force:       true,
+		manifest:    manifest,
 		name:        ae.Manifest.Name,
 		bundle:      ae.Manifest.Bundle,
 		version:     ae.Manifest.Version,
-		manifest:    ae.Manifest.String(),
 		extensionID: ae.Manifest.ExtensionID,
 	})
 
-	err := ae.Context.GraphqlClient.Mutate(context.Background(), &mutation, variables)
+	netErr := ae.Context.GraphqlClient.Mutate(context.Background(), &mutation, variables)
 
 	fmt.Printf("Mutation %s \n", ae.Manifest.String())
 
-	if err != nil {
-		return false, err
+	if netErr != nil {
+		return false, netErr
 	}
 
 	return true, nil
