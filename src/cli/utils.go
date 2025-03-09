@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -11,7 +10,7 @@ import (
 func findFile(dir string, fileNames []string) string {
 	var content string
 	for _, f := range fileNames {
-		data, err := ioutil.ReadFile(filepath.Join(dir, f))
+		data, err := os.ReadFile(filepath.Join(dir, f))
 		if err != nil {
 			continue
 		}
@@ -23,7 +22,7 @@ func findFile(dir string, fileNames []string) string {
 }
 
 func readFile(dir string, fileName string) ([]byte, error) {
-	return ioutil.ReadFile(filepath.Join(dir, fileName))
+	return os.ReadFile(filepath.Join(dir, fileName))
 }
 
 func runCommand(dir string, command string, env string) (bool, error) {

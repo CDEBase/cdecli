@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -28,14 +27,15 @@ func loadConfig(configPath string, flags *ApplicationFlags) (*Config, error) {
 		cfgPath = filepath.Join(user.HomeDir, "cde-config.json")
 	}
 
-	data, err := ioutil.ReadFile(os.ExpandEnv(cfgPath))
+	data, err := os.ReadFile(os.ExpandEnv(cfgPath))
 
 	if err != nil && (!os.IsNotExist(err) || userSpecified) {
 		return nil, err
 	}
 
+	config := &Config{}
 	if err == nil {
-		if err := json.Unmarshal(data, &config); err != nil {
+		if err := json.Unmarshal(data, config); err != nil {
 			return nil, err
 		}
 	}

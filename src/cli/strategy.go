@@ -3,17 +3,21 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/shurcooL/graphql"
-	"io/ioutil"
+	"os"
 	"path/filepath"
+	"time"
+
+	"github.com/shurcooL/graphql"
 )
 
+// ExtensionContext holds execution context for extension operations
 type ExtensionContext struct {
 	Dir           string
 	ManifestFile  string
 	GraphqlClient *graphql.Client
 }
 
+// ExtensionLifecycle defines the interface for extension lifecycle operations
 type ExtensionLifecycle interface {
 	Build() (bool, error)
 	Pack() (string, error)
@@ -21,6 +25,7 @@ type ExtensionLifecycle interface {
 	AddToRegistry(context *ExtensionContext) (bool, error)
 }
 
+// AbstractExtension provides common functionality for extension implementations
 type AbstractExtension struct {
 	ExtensionLifecycle
 
@@ -28,28 +33,35 @@ type AbstractExtension struct {
 	Context  *ExtensionContext
 }
 
+// NPMExtension implements lifecycle for NPM-based extensions
 type NPMExtension struct {
 	AbstractExtension
 }
 
+// RAWExtension implements lifecycle for simple non-NPM extensions
 type RAWExtension struct {
 	AbstractExtension
 }
 
 // Common Lifecycle commands
 
+// Build executes the build process for an extension
 func (ae AbstractExtension) Build() (bool, error) {
 	return runCommand(ae.Context.Dir, ae.Manifest.Scripts.Build, "")
 }
 
+// AddToRegistry adds the extension to the CDEBase registry
 func (ae AbstractExtension) AddToRegistry(ctx *ExtensionContext) (bool, error) {
 	manifest := ae.Manifest.String()
 
-	data, err := ioutil.ReadFile(filepath.Join(ctx.Dir, ctx.ManifestFile))
-
+	data, err := os.ReadFile(filepath.Join(ctx.Dir, ctx.ManifestFile))
 	if err == nil {
 		manifest = string(data)
 	}
+
+	fmt.Println("Preparing to add extension to registry...")
+	fmt.Printf("Using endpoint: %s\n", config.Endpoint)
+	fmt.Printf("Extension ID: %s\n", ae.Manifest.ExtensionID)
 
 	mutation, variables := NewPublishExtensionMutation(PublishExtensionVariables{
 		force:       true,
@@ -60,45 +72,44 @@ func (ae AbstractExtension) AddToRegistry(ctx *ExtensionContext) (bool, error) {
 		extensionID: ae.Manifest.ExtensionID,
 	})
 
-	netErr := ae.Context.GraphqlClient.Mutate(context.Background(), &mutation, variables)
+	// Set a context with timeout
+	ctx2, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
-	fmt.Printf("Mutation %s \n", ae.Manifest.String())
-
+	netErr := ae.Context.GraphqlClient.Mutate(ctx2, &mutation, variables)
 	if netErr != nil {
+		fmt.Printf("GraphQL error: %v\n", netErr)
 		return false, netErr
 	}
 
+	fmt.Printf("Extension %s successfully published\n", ae.Manifest.ExtensionID)
 	return true, nil
 }
 
+// Pack prepares the extension for publishing
 func (ae AbstractExtension) Pack() (string, error) {
-	var err error
 	fmt.Println("Packing extension and preparing to publish...")
 
-	err = ae.Manifest.ReadAssets(ae.Context.Dir)
-
-	if err != nil {
+	if err := ae.Manifest.ReadAssets(ae.Context.Dir); err != nil {
 		return "", err
 	}
 
-	err = ae.Manifest.ReadBundle(ae.Context.Dir)
-
-	if err != nil {
+	if err := ae.Manifest.ReadBundle(ae.Context.Dir); err != nil {
 		return "", err
 	}
 
 	return "", nil
 }
 
-// Build RAW Extension
+// Implementation-specific methods
 
+// Publish for RAW extensions
 func (re RAWExtension) Publish() (bool, error) {
-	fmt.Println("Waiting for extension publish...")
+	fmt.Println("Publishing simple extension...")
 	return true, nil
 }
 
-// Build NPM Extension
-
+// Publish for NPM extensions
 func (ne NPMExtension) Publish() (bool, error) {
 	var cmd = fmt.Sprintf("npm publish --registry=%s", config.Registry)
 

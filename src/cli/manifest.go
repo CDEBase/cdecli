@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 )
 
@@ -39,7 +39,7 @@ func ReadManifest(context *ExtensionContext) (*Manifest, ExtensionLifecycle, err
 	manifest := Manifest{}
 	var strategy ExtensionLifecycle
 
-	data, err := ioutil.ReadFile(filepath.Join(context.Dir, context.ManifestFile))
+	data, err := os.ReadFile(filepath.Join(context.Dir, context.ManifestFile))
 	if err != nil {
 		return nil, nil, fmt.Errorf("%s\n\nRun this command in a directory with a %s file for an extension.\n\n", err, context.ManifestFile)
 	}

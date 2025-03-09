@@ -2,7 +2,7 @@ package main
 
 import "github.com/shurcooL/graphql"
 
-// Publish Extension
+// PublishExtensionVariables contains all variables needed for the PublishExtension mutation
 type PublishExtensionVariables struct {
 	force       bool
 	bundle      string
@@ -13,6 +13,7 @@ type PublishExtensionVariables struct {
 	sourceMap   string
 }
 
+// PublishExtensionMutation represents the GraphQL mutation for publishing an extension
 type PublishExtensionMutation struct {
 	PublishExtension struct {
 		Extension struct {
@@ -23,6 +24,7 @@ type PublishExtensionMutation struct {
 	} `graphql:"publishExtension(force: $force, bundle: $bundle, name: $name, version: $version, manifest: $manifest, sourceMap: $sourceMap, extensionID: $extensionID)"`
 }
 
+// NewPublishExtensionMutation creates a new mutation with the provided variables
 func NewPublishExtensionMutation(vars PublishExtensionVariables) (PublishExtensionMutation, map[string]interface{}) {
 	m := PublishExtensionMutation{}
 	variables := map[string]interface{}{
