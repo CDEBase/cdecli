@@ -33,7 +33,7 @@ for PLATFORM in "${PLATFORMS[@]}"; do
   fi
 
   echo "Building for $GOOS/$GOARCH..."
-  GOOS=$GOOS GOARCH=$GOARCH go build -o ./release/$OUTPUT_NAME ./src/cli
+  GOOS=$GOOS GOARCH=$GOARCH go build -ldflags "-X main.version=$VERSION" -o ./release/$OUTPUT_NAME ./src/cli
 done
 
 echo "Release v$VERSION created!"

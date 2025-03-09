@@ -57,6 +57,7 @@ func init() {
 						GraphqlClient: client,
 						ManifestFile:  flags.Manifest,
 						Dir:           filepath.Join(pwd, flags.Dir),
+						Config:        config,
 					}
 
 					fmt.Println("Reading manifest file:", context.ManifestFile)

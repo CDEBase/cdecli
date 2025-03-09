@@ -18,7 +18,7 @@ type ApplicationFlags struct {
 
 var (
 	config   *Config
-	version  = "0.1.0"
+	version  = "dev"    // Default version when not set via build flag
 	commands []*cli.Command
 	flags    = ApplicationFlags{}
 )

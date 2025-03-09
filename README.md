@@ -76,7 +76,8 @@ To acquire the access token, visit your Cdecode instance (or https://cdecode.com
 If you want to develop the CLI, you can install it with `go get`:
 
 ```
-go get -u github.com/cdecode/cli-tool/cmd/cdecli
+go build -ldflags "-X main.version=0.5.1" -o cdecli ./src/cli
+sudo cp cdecli /usr/local/bin/
 ```
 
 ## Releasing

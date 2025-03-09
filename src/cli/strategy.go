@@ -15,6 +15,7 @@ type ExtensionContext struct {
 	Dir           string
 	ManifestFile  string
 	GraphqlClient *graphql.Client
+	Config        *Config
 }
 
 // ExtensionLifecycle defines the interface for extension lifecycle operations
@@ -60,7 +61,18 @@ func (ae AbstractExtension) AddToRegistry(ctx *ExtensionContext) (bool, error) {
 	}
 
 	fmt.Println("Preparing to add extension to registry...")
-	fmt.Printf("Using endpoint: %s\n", config.Endpoint)
+	
+	// Get config from the configuration that was loaded in the extension.go file
+	localConfig, err := loadConfig(flags.ConfigPath, &flags)
+	if err != nil {
+		return false, fmt.Errorf("failed to load configuration: %v", err)
+	}
+	
+	if localConfig.Endpoint == "" {
+		return false, fmt.Errorf("endpoint not configured - please set in config file or with --endpoint flag")
+	}
+	
+	fmt.Printf("Using endpoint: %s\n", localConfig.Endpoint)
 	fmt.Printf("Extension ID: %s\n", ae.Manifest.ExtensionID)
 
 	mutation, variables := NewPublishExtensionMutation(PublishExtensionVariables{
